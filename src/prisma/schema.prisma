@@ -1,0 +1,40 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 Int           @id @default(autoincrement())
+  name               String
+  email              String        @unique
+  password           String
+  streakCount        Int           @default(0)
+  lastCompletedDate  DateTime?
+  issues             Issue[]
+  dailyStreaks       DailyStreak[]
+}
+
+model Issue {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  status    String   @default("To Do")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model DailyStreak {
+  id         Int      @id @default(autoincrement())
+  date       DateTime @unique
+  points     Int
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+}
